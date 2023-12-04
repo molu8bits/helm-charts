@@ -38,4 +38,4 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 ## Checklist
 
 - [ ] Chart Version bumped
-- [ ] Title of the PR starts with chart name (e.g. `[prometheus-vmware-exporter]`)
+- [ ] Title of the PR starts with chart name (e.g. `[prometheus-s3bucket-exporter]`)
