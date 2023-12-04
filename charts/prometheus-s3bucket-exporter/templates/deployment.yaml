@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prometheus-s3bucket-exporter.fullname" . }}
+  labels:
+    {{- include "prometheus-s3bucket-exporter.labels" . | nindent 4 }}
+    {{- with .Values.deployment.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "prometheus-s3bucket-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "prometheus-s3bucket-exporter.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      # automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prometheus-s3bucket-exporter.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- if .Values.initContainers }}
+      initContainers:
+{{ toYaml .Values.initContainers | indent 8 }}
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prometheus-s3bucket-exporter.secretName" . }}
+                  key: s3AccessKey
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prometheus-s3bucket-exporter.secretName" . }}
+                  key: s3SecretKey
+            - name: S3_NAME
+              value: {{ .Values.s3bucket.name | default "MyS3Endpoint" }}
+            - name: S3_ENDPOINT
+              value: {{ required "A valid .Values.s3bucket.s3Endpoint entry required!" .Values.s3bucket.s3Endpoint }}
+            - name: S3_REGION
+              value: {{ .Values.s3bucket.s3Region | default "us-east-1" }}
+            - name: LOG_LEVEL
+              value: {{ .Values.s3bucket.logLevel | default "info" }}
+            - name: S3_DISABLE_SSL
+              value: {{ .Values.s3bucket.s3DisableSSL | quote | default false }}
+            - name: S3_DISABLE_ENDPOINT_HOST_PREFIX
+              value: {{ .Values.s3bucket.s3DisableEndpointHostPrefix | quote | default false }}
+            - name: S3_FORCE_PATH_STYLE
+              value: {{ .Values.s3bucket.s3ForcePathStyle | quote | default true }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            # httpGet:
+            #   path: /
+            #   port: http
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            # initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            # timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            # httpGet:
+            #   path: /
+            #   port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

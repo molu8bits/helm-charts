@@ -1,0 +1,115 @@
+# Default values for prometheus-s3bucket-exporter.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  registry: docker.io
+  repository: molu8bits/s3bucket_exporter
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 10001
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 10001
+  # runAsGroup: 10001
+  # allowPrivilegeEscalation: false
+  # seccompProfile:
+  #   type: "RuntimeDefault"
+
+annotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "9512"
+
+s3bucket:
+  s3name: "MyS3Endpoint"
+  # s3Endpoint: "s3.amazonaws.com"
+  s3Endpoint: ""
+  s3AccessKey: ""
+  s3SecretKey: ""
+  s3Region: ""
+  # logLevel possible values: "Debug", "Info"
+  logLevel: "Info"
+  s3DisableSSL: false
+  s3DisableEndpointHostPrefix: false
+  s3ForcePathStyle: true
+
+existingSecret:
+  name: ""
+
+secret:
+  annotations: {}
+    # key: "true"
+    # example: "false"
+
+service:
+  type: ClusterIP
+  port: 9655
+
+serviceMonitor:
+  # When set true then use a ServiceMonitor to configure scraping
+  enabled: false
+  # Set the namespace the ServiceMonitor should be deployed
+  # namespace: monitoring
+  # Set how frequently Prometheus should scrape
+  # interval: 60s
+  # Set path to cloudwatch-exporter telemetry-path
+  # telemetryPath: /metrics
+  # Set labels for the ServiceMonitor, use this to define your scrape label for Prometheus Operator
+  # labels:
+  # Set timeout for scrape
+  # timeout: 10s
+  # Set of labels to transfer from the Kubernetes Service onto the target
+  # targetLabels: []
+
+resources: {}
+#   limits:
+#     cpu: 100m
+#     memory: 128Mi
+#   requests:
+#     cpu: 100m
+#     memory: 128Mi
+
+nodeSelector: {}
+
+# Configurable health checks
+livenessProbe:
+  initialDelaySeconds: 0
+  timeoutSeconds: 5
+
+readinessProbe:
+  initialDelaySeconds: 0
+  timeoutSeconds: 3
+
+# Labels and annotations to attach to the deployment resource
+deployment:
+  labels: {}
+  annotations: {}
+
+tolerations: []
+
+affinity: {}

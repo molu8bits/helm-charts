@@ -1,0 +1,10 @@
+s3bucket:
+  s3name: "MyS3Endpoint"
+  s3Endpoint: "s3.amazonaws.com"
+  s3AccessKey: "access"
+  s3SecretKey: "supersecret"
+  s3Region: ""
+  logLevel: "Info"
+  s3DisableSSL: false
+  s3DisableEndpointHostPrefix: false
+  s3ForcePathStyle: true
