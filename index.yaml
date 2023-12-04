@@ -1,0 +1,18 @@
+apiVersion: v1
+entries:
+  prometheus-s3bucket-exporter:
+  - apiVersion: v2
+    appVersion: 1.0.2
+    created: "2023-12-04T09:42:09.706412937Z"
+    description: A Helm chart for prometheus s3bucket exporter
+    digest: d6630cea00a008942244723319211d2180ea107ca92465be43b2c348b6849748
+    home: https://github.com/molu8bits/prometheus-s3bucket-exporter
+    maintainers:
+    - email: 37955546+molu8bits@users.noreply.github.com
+      name: molu8bits
+    name: prometheus-s3bucket-exporter
+    type: application
+    urls:
+    - https://github.com/molu8bits/helm-charts/releases/download/prometheus-s3bucket-exporter-0.1.0/prometheus-s3bucket-exporter-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-12-04T09:42:09.706418217Z"
